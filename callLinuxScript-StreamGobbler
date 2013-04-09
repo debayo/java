@@ -1,0 +1,66 @@
+package cn.edu.zju.eagle.watermark;
+
+
+import java.io.*;
+import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
+
+
+class StreamGobbler implements Callable {
+
+  Logger LOGGER = Logger.getLogger(StreamGobbler.class);
+	private String processType;
+	private String streamType;
+	private InputStream is;
+	private String recordFilename;
+
+	StreamGobbler(String processType, String streamType, InputStream is,
+			String targetFilename) {
+		this.processType = processType;
+		this.streamType = streamType;
+		this.is = is;
+		this.recordFilename = targetFilename;
+	}
+
+	public Object call() throws Exception {
+		String similarity = "";
+		String regEx = "^##(\\d+)";
+		Pattern p = Pattern.compile(regEx);
+		OutputStreamWriter isw = null;
+		BufferedWriter bw = null;
+		InputStreamReader isr = null;
+		BufferedReader br = null;
+
+		isr = new InputStreamReader(is);
+		br = new BufferedReader(isr);
+		isw = new OutputStreamWriter(new FileOutputStream(recordFilename));
+		bw = new BufferedWriter(isw);
+		
+		LOGGER.debug("In StreamGobbler call");
+		try {
+
+			String line = null;
+			int progressNumber = 0;
+			boolean changed;
+			Matcher m = null;
+			
+			while ((line = br.readLine()) != null) {
+				#anything
+			
+			}
+			br.close();
+			isr.close();
+
+		} catch (IOException ioe) {
+		  #do
+		} finally {
+			bw.flush();
+			bw.close();
+			isw.close();
+		}
+		return similarity;
+	}
+}
