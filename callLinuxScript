@@ -1,0 +1,53 @@
+  public int call() throws Exception {
+        String[] execArgs = new String[6];
+		int exitVal = -1;
+		String ext1= "-mp3";
+		String ext2 ="-mp3";
+		ext1 = "-" + srcFile.substring(srcFile.lastIndexOf(".")+1);
+		ext2 = "-" + targetFile.substring(targetFile.lastIndexOf(".")+1);
+		
+		execArgs[0] = new String(program);
+		execArgs[1] = new String(srcFile);
+		execArgs[2] = new String(ext1);
+		execArgs[3] = new String(targetFile);
+		execArgs[4] = new String(ext2);
+		execArgs[5] = new String(watermarkFile);
+		
+		for(String s:execArgs)
+		{
+			  LOGGER.debug(s);
+		}
+
+		File workSpace = new File(Parameter.baseWorkSpace);
+		Process process = Runtime.getRuntime().exec(execArgs,null,workSpace);
+		// 创建一个线程池
+		ExecutorService pool = Executors.newFixedThreadPool(2);
+		// 创建两个有返回值的任务
+
+		// any error message?
+//		ImbedStreamGobbler errorGobbler = new ImbedStreamGobbler(
+//				process.getErrorStream(), "ERROR", recordFilename+"_error");
+		StreamGobbler errorGobbler = new StreamGobbler("Imbed", "ERROR",
+		process.getErrorStream(), recordFilename);
+		
+		// any output?
+//		ImbedStreamGobbler outputGobbler = new ImbedStreamGobbler(
+//				process.getInputStream(), "OUTPUT", recordFilename);
+		StreamGobbler outputGobbler = new StreamGobbler("Imbed", "OUTPUT",
+		process.getInputStream(), recordFilename);
+		
+		// 执行任务并获取Future对象
+		Future f1 = pool.submit(errorGobbler);
+		Future f2 = pool.submit(outputGobbler);
+
+		// 从Future对象上获取任务的返回值，并输出到控制台
+
+		System.out.println(f2.get().toString());
+		// 关闭线程池
+		pool.shutdown();
+
+		// any error
+		exitVal = process.waitFor();
+
+		return exitVal;
+	}
